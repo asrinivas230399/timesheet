@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Add Page</title>
     <style>
-        .required::after { content: "*"; color: red; }
         .error { color: red; }
+        .required::after { content: "*"; color: red; }
     </style>
 </head>
 <body>
     <h1>Add New Customer</h1>
     <form id="customerForm">
         <div>
-            <label class="required" for="customerName">Customer Name</label>
+            <label for="customerName" class="required">Customer Name</label>
             <input type="text" id="customerName" name="customerName" required>
         </div>
         <div>
@@ -25,8 +25,10 @@
             <label for="image">Image/Logo (optional)</label>
             <input type="file" id="image" name="image" accept="image/*">
         </div>
-        <button type="submit">Add Customer</button>
-        <button type="button" onclick="cancel()">Cancel</button>
+        <div>
+            <button type="submit">Add Customer</button>
+            <button type="button" onclick="cancel()">Cancel</button>
+        </div>
         <div id="message"></div>
     </form>
 
