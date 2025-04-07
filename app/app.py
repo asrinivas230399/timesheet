@@ -4,53 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Add Page</title>
+    <title>Customer Edit Page</title>
     <style>
         .error { color: red; }
-        .required::after { content: "*"; color: red; }
+        .success { color: green; }
     </style>
 </head>
 <body>
-    <h1>Add New Customer</h1>
+    <h1>Edit Customer Details</h1>
     <form id="customerForm">
-        <div>
-            <label for="customerName" class="required">Customer Name</label>
-            <input type="text" id="customerName" name="customerName" required>
-        </div>
-        <div>
-            <label for="description">Description</label>
-            <textarea id="description" name="description"></textarea>
-        </div>
-        <div>
-            <label for="image">Image/Logo (optional)</label>
-            <input type="file" id="image" name="image" accept="image/*">
-        </div>
-        <div>
-            <button type="submit">Add Customer</button>
-            <button type="button" onclick="cancel()">Cancel</button>
-        </div>
-        <div id="message"></div>
+        <label for="customerName">Customer Name (required):</label>
+        <input type="text" id="customerName" name="customerName" required>
+        <br>
+        <label for="description">Description (optional):</label>
+        <textarea id="description" name="description"></textarea>
+        <br>
+        <label for="image">Image (optional):</label>
+        <input type="file" id="image" name="image" accept="image/*">
+        <br>
+        <button type="submit">Save</button>
     </form>
+    <div id="message"></div>
 
     <script>
-        document.getElementById('customerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const customerName = document.getElementById('customerName').value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('customerForm');
             const messageDiv = document.getElementById('message');
-            if (!customerName) {
-                messageDiv.textContent = 'Error: Customer Name is required.';
-                messageDiv.className = 'error';
-            } else {
-                messageDiv.textContent = 'Customer successfully added!';
-                messageDiv.className = '';
-                this.reset();
-            }
-        });
 
-        function cancel() {
-            document.getElementById('customerForm').reset();
-            document.getElementById('message').textContent = '';
-        }
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const customerName = form.customerName.value.trim();
+
+                if (!customerName) {
+                    messageDiv.textContent = 'Customer Name is required.';
+                    messageDiv.className = 'error';
+                    return;
+                }
+
+                const formData = new FormData(form);
+                fetch('/api/updateCustomer', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messageDiv.textContent = 'Customer details updated successfully.';
+                        messageDiv.className = 'success';
+                    } else {
+                        messageDiv.textContent = 'Error updating customer details.';
+                        messageDiv.className = 'error';
+                    }
+                })
+                .catch(() => {
+                    messageDiv.textContent = 'Error updating customer details.';
+                    messageDiv.className = 'error';
+                });
+            });
+
+            // Fetch current customer details and populate the form
+            fetch('/api/getCustomerDetails')
+                .then(response => response.json())
+                .then(data => {
+                    form.customerName.value = data.customerName || '';
+                    form.description.value = data.description || '';
+                    // Assume image handling is done separately
+                });
+        });
     </script>
 </body>
 </html>
